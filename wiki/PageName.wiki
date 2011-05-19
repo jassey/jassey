@@ -1,0 +1,41 @@
+#summary One-sentence summary of this page.
+
+= 临时表与表变量 =
+
+临时表：
+=============================================================================
+#局部，当前用户可见,在当前连接结束或drop时才会消失。
+
+##全局，所有用户可见，所有引用该表的用户断开时，删除。
+{{{
+create table #date_list
+(
+	adddate datetime
+)
+}}}
+与物理表类似，在TempDB中，可以创建索引和约束。
+
+
+表变量：
+=============================================================================
+@局部，当前用户可见，在当前连接结束时会消失。
+
+@@全局，所有用户可见。
+{{{
+declare @date_list table 
+(
+	adddate datetime
+)
+
+insert @date_list
+select  adddate from uc_Users where userid in (
+	select userid from webclick.hj_webclick.dbo.ActiveUser_class where dateadded = '2011-5-16'
+)
+}}}
+
+区别：
+表变量在内存中，缺少表的一些特性，如：索引，约束等，同时也没有锁的机制。
+
+使用上的差别：
+临时表，在当前连接需要手工drop table，否则下次创建时会有问题。
+表变量，会在内存中创建，适用于数据量较小，简单计算用。
